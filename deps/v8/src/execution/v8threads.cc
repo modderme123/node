@@ -26,7 +26,7 @@ base::AtomicWord g_locker_was_ever_used_ = 0;
 
 // Once the Locker is initialized, the current thread will be guaranteed to have
 // the lock for a given isolate.
-void Locker::Initialize(v8::Isolate* isolate) {
+void Locker::Initialize(v8::Isolate* isolate, int thread_id) {
   DCHECK_NOT_NULL(isolate);
   has_lock_ = false;
   top_level_ = true;
@@ -47,6 +47,9 @@ void Locker::Initialize(v8::Isolate* isolate) {
       top_level_ = false;
     }
   }
+
+  if (thread_id != 0) isolate_->set_thread_id(internal::ThreadId::FromInteger(thread_id));
+
   DCHECK(isolate_->thread_manager()->IsLockedByCurrentThread());
 }
 
@@ -68,10 +71,11 @@ Locker::~Locker() {
   }
 }
 
-void Unlocker::Initialize(v8::Isolate* isolate) {
+void Unlocker::Initialize(v8::Isolate* isolate, int thread_id) {
   DCHECK_NOT_NULL(isolate);
   isolate_ = reinterpret_cast<i::Isolate*>(isolate);
   DCHECK(isolate_->thread_manager()->IsLockedByCurrentThread());
+  if (thread_id != 0) isolate_->set_thread_id(internal::ThreadId::FromInteger(thread_id));
   isolate_->thread_manager()->ArchiveThread();
   isolate_->thread_manager()->Unlock();
 }

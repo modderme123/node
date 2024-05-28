@@ -96,12 +96,12 @@ class V8_EXPORT Unlocker {
   /**
    * Initialize Unlocker for a given Isolate.
    */
-  V8_INLINE explicit Unlocker(Isolate* isolate) { Initialize(isolate); }
+  V8_INLINE explicit Unlocker(Isolate* isolate, int thread_id = 0) { Initialize(isolate, thread_id); }
 
   ~Unlocker();
 
  private:
-  void Initialize(Isolate* isolate);
+  void Initialize(Isolate* isolate, int thread_id = 0);
 
   internal::Isolate* isolate_;
 };
@@ -111,7 +111,7 @@ class V8_EXPORT Locker {
   /**
    * Initialize Locker for a given Isolate.
    */
-  V8_INLINE explicit Locker(Isolate* isolate) { Initialize(isolate); }
+  V8_INLINE explicit Locker(Isolate* isolate, int thread_id = 0) { Initialize(isolate, thread_id); }
 
   ~Locker();
 
@@ -126,7 +126,7 @@ class V8_EXPORT Locker {
   void operator=(const Locker&) = delete;
 
  private:
-  void Initialize(Isolate* isolate);
+  void Initialize(Isolate* isolate, int thread_id = 0);
 
   bool has_lock_;
   bool top_level_;
